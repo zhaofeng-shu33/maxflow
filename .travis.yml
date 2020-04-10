@@ -7,7 +7,7 @@ script:
   - cmake ..
   - make
   - cp ../test/test.py src/
-  - cp ../example.lnp src/
+  - cp ../example.inp src/
   - cd src
   - python3 test.py
 
