@@ -21,9 +21,51 @@
 #include "common_types.h"
 #include <queue>
 #include <algorithm>
+template <typename T, typename U, template <typename, typename> typename EDGE = cached_edge>
+std::vector<std::vector<EDGE<T, U>>>&& load_graph(std::vector<std::tuple<T,T,U>> edge_list,
+    T vertex_cnt, T edge_cnt) {
+    auto undefined = std::numeric_limits<T>::max ();
+    std::vector<EDGE<T, U>> edges;
+    edges . resize ( edge_cnt * 2 );
+    std::vector<std::unordered_map<T, T>> edge_map( vertex_cnt );
+    std::vector<uint32_t> outgoing_edge_cnt ( vertex_cnt );
+    std::size_t pos = 0;
+    for (std::tuple<T,T,U>& edge_tuple : edge_list)
+    {
+        T from = std::get<0>(edge_tuple);
+        T to = std::get<1>(edge_tuple);
+        U cap = std::get<2>(edge_tuple);
+        auto it = edge_map[from] . find ( to );
+        //handle multi edges
+        if ( it != std::end ( edge_map[from] ) )
+        {
+            edges[it -> second] . r_capacity += cap;
+            break;
+        }
+        it = edge_map[to] . find ( from );
+        //handle backward edges
+        if ( it != std::end ( edge_map[to] ) )
+            edges[it -> second + 1] . r_capacity += cap;
+        else
+        {
+            edges[pos] = EDGE<T, U> { to, cap, undefined };
+            edges[pos + 1] = EDGE<T, U> { from, 0, undefined };
+            ++outgoing_edge_cnt[from];
+            ++outgoing_edge_cnt[to];
+            edge_map[from] . emplace ( to, pos );
+            pos += 2;
+        }
+    }
+    edge_map . clear ();
+    edge_map . shrink_to_fit ();    
+    //alloc graph
+    std::vector<std::vector<EDGE<T, U>>> graph ( vertex_cnt );
+    load_graph_from_ds(graph, edges, outgoing_edge_cnt);
+    return std::move(graph);
+}
 
 template <typename T, typename U, template <typename, typename> typename EDGE = basic_edge>
-auto load_graph_from_ds (std::vector<std::vector<EDGE<T, U>>>& graph,
+void load_graph_from_ds (std::vector<std::vector<EDGE<T, U>>>& graph,
     std::vector<EDGE<T, U>> edges,
     std::vector<uint32_t> outgoing_edge_cnt) {
     for ( std::size_t i = 0; i < graph . size (); ++i )
@@ -53,8 +95,9 @@ auto load_graph_from_ds (std::vector<std::vector<EDGE<T, U>>>& graph,
             edge . reverse_edge_index = graph[edge . dst_vertex] . size ();
             graph[edge . dst_vertex] . emplace_back ( i, reverse_edge . r_capacity, k );
         }
-    }
+    }    
 }
+
 template <typename T, typename U, template <typename, typename> typename EDGE = basic_edge>
 auto load_graph ( std::istream & is )
 {
