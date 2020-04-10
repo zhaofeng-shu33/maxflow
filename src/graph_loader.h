@@ -22,7 +22,39 @@
 #include <queue>
 #include <algorithm>
 
+template <typename T, typename U, template <typename, typename> typename EDGE = basic_edge>
+auto load_graph_from_ds (std::vector<std::vector<EDGE<T, U>>>& graph,
+    std::vector<EDGE<T, U>> edges,
+    std::vector<uint32_t> outgoing_edge_cnt) {
+    for ( std::size_t i = 0; i < graph . size (); ++i )
+        graph[i] . reserve ( outgoing_edge_cnt[i] );
 
+    //insert forward edges
+    for ( std::size_t i = 0; i < edges.size(); i += 2 )
+    {
+        auto & edge = edges[i];
+        auto & reverse_edge = edges[i + 1];
+
+        graph[reverse_edge . dst_vertex] . emplace_back ( edge . dst_vertex,
+                    edge . r_capacity, i + 1 );
+    }
+
+    auto sizes = std::make_unique<uint32_t[]> ( graph . size () );
+    for ( std::size_t i = 0; i < graph . size (); ++i )
+        sizes[i] = graph[i] . size ();
+
+    //insert backward edges
+    for ( std::size_t i = 0; i < graph . size (); ++i )
+    {
+        for ( std::size_t k = 0; k < sizes[i]; ++k )
+        {
+            auto & edge = graph[i][k];
+            auto reverse_edge = edges[edge . reverse_edge_index];
+            edge . reverse_edge_index = graph[edge . dst_vertex] . size ();
+            graph[edge . dst_vertex] . emplace_back ( i, reverse_edge . r_capacity, k );
+        }
+    }
+}
 template <typename T, typename U, template <typename, typename> typename EDGE = basic_edge>
 auto load_graph ( std::istream & is )
 {
@@ -117,33 +149,7 @@ auto load_graph ( std::istream & is )
 
     //alloc graph
     std::vector<std::vector<EDGE<T, U>>> graph ( vertex_cnt );
-    for ( std::size_t i = 0; i < graph . size (); ++i )
-        graph[i] . reserve ( outgoing_edge_cnt[i] );
-
-    //insert forward edges
-    for ( std::size_t i = 0; i < pos; i += 2 )
-    {
-        auto & edge = edges[i];
-        auto & reverse_edge = edges[i + 1];
-
-        graph[reverse_edge . dst_vertex] . emplace_back ( edge . dst_vertex, edge . r_capacity, i + 1 );
-    }
-
-    auto sizes = std::make_unique<uint32_t[]> ( graph . size () );
-    for ( std::size_t i = 0; i < graph . size (); ++i )
-        sizes[i] = graph[i] . size ();
-
-    //insert backward edges
-    for ( std::size_t i = 0; i < graph . size (); ++i )
-    {
-        for ( std::size_t k = 0; k < sizes[i]; ++k )
-        {
-            auto & edge = graph[i][k];
-            auto reverse_edge = edges[edge . reverse_edge_index];
-            edge . reverse_edge_index = graph[edge . dst_vertex] . size ();
-            graph[edge . dst_vertex] . emplace_back ( i, reverse_edge . r_capacity, k );
-        }
-    }
+    load_graph_from_ds(graph, edges, outgoing_edge_cnt);
 
     return std::make_tuple ( std::move ( graph ), source, sink );
 }

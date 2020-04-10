@@ -2,12 +2,5 @@ os: linux
 dist: bionic
 language: cpp
 script:
-  - mkdir build
-  - cd build
-  - cmake ..
-  - make
-  - cp ../test/test.py src/
-  - cp ../example.inp src/
-  - cd src
-  - python3 test.py
+  - bash build.sh
 
