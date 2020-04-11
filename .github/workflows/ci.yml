@@ -7,4 +7,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: install, build and test
-        run: bash test/install.sh && bash build.sh
+        run: sudo bash test/install.sh && bash build.sh
