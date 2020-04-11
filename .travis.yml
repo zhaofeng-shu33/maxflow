@@ -1,5 +1,12 @@
 os: linux
 dist: bionic
+sudo: required
+addons:
+  apt:
+    sources:
+      - sourceline: 'ppa:zhaofeng-shu33/gtest'
+    packages:
+      - libgtest-dev
 language: cpp
 script:
   - bash build.sh
