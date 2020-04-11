@@ -22,7 +22,7 @@
 #include <queue>
 #include <algorithm>
 template <typename T, typename U, template <typename, typename> typename EDGE = cached_edge>
-std::vector<std::vector<EDGE<T, U>>>&& load_graph(std::vector<std::tuple<T,T,U>> edge_list,
+std::vector<std::vector<EDGE<T, U>>> load_graph(std::vector<std::tuple<T,T,U>> edge_list,
     T vertex_cnt, T edge_cnt) {
     auto undefined = std::numeric_limits<T>::max ();
     std::vector<EDGE<T, U>> edges;
@@ -61,7 +61,7 @@ std::vector<std::vector<EDGE<T, U>>>&& load_graph(std::vector<std::tuple<T,T,U>>
     //alloc graph
     std::vector<std::vector<EDGE<T, U>>> graph ( vertex_cnt );
     load_graph_from_ds(graph, edges, outgoing_edge_cnt);
-    return std::move(graph);
+    return graph;
 }
 
 template <typename T, typename U, template <typename, typename> typename EDGE = basic_edge>
