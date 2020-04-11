@@ -1,4 +1,5 @@
-os: push
+name: maxflow
+os: [push]
 
 jobs:
   build:
