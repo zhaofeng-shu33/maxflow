@@ -1,0 +1,9 @@
+os: push
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: install, build and test
+      run: bash test/install.sh && bash build.sh
