@@ -4,7 +4,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
-set(CXX_COVERAGE_COMPILE_FLAGS "-Wall -pedantic -Wextra -g -O3 -march=native -funroll-loops -ftree-vectorize -fopenmp")
+#set(CXX_COVERAGE_COMPILE_FLAGS "-Wall -pedantic -Wextra -g -O3 -march=native -funroll-loops -ftree-vectorize -fopenmp")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_COVERAGE_COMPILE_FLAGS}")
+
+find_package(OpenMP REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
 add_executable(maxflow maxflow.cpp)
