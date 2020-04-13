@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "Maxflow/graph_loader.h"
+#include "Maxflow/algorithms/parallel/parallel_push_relabel.h"
 
 TEST(PREFLOW, CONSTRUCT) {
     typedef uint32_t T;
@@ -18,4 +19,10 @@ TEST(PREFLOW, CONSTRUCT) {
 
     std::vector<std::vector<cached_edge<T, U>>> graph = load_graph(
         edge_list, vertex_cnt, edge_cnt);
+    T source = 0, sink = 5;
+    std::size_t thread_count = 2;
+    parallel_push_relabel::max_flow_instance<std::vector, T, U> solver ( std::move ( graph ),
+        source, sink, thread_count);
+    U res = solver . find_max_flow ();
+    ASSERT_EQ(res, 14);
 }

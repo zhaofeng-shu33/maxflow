@@ -1,5 +1,6 @@
 set -e -x
-echo "deb http://ppa.launchpad.net/zhaofeng-shu33/gtest/ubuntu xenial main" > /etc/apt/sources.list.d/gtest.list
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B4552FED361B2FCCEAD7193C69FDF0C946D67581
+echo "deb http://dl.bintray.com/zhaofeng-shu33/libgtest/ bionic main" > /etc/apt/sources.list.d/gtest.list
+wget https://bintray.com/user/downloadSubjectPublicKey?username=bintray -O bintray-public.key.asc
+apt-key add bintray-public.key.asc
 apt update
-apt install --yes g++ libgtest-dev cmake
+apt install --yes g++ libgtest1.7 cmake
